@@ -35,6 +35,15 @@ public class ClientHandler {
                         if (message.equalsIgnoreCase("/exit")) {
                             sendMsg("/exitok");
                             break;
+                        } else if (message.startsWith("/w ")) {
+                            String[] tokens = message.split(" ", 3);
+                            if (tokens.length == 3) {
+                                String recipient = tokens[1];
+                                String privateMessage = tokens[2];
+                                server.sendPrivateMessage(this, recipient, privateMessage);
+                            } else {
+                                sendMsg("Неверный формат комманды. Используйте /w <никнейм> <сообщение>");
+                            }
                         }
                     } else {
                         server.broadcastMessage(username + " : " + message);

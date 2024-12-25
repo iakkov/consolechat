@@ -42,4 +42,14 @@ public class Server {
             c.sendMsg(message);
         }
     }
+    public void sendPrivateMessage(ClientHandler sender, String recipient, String message) {
+        for (ClientHandler client : clients) {
+            if (client.getUsername().equals(recipient)) {
+                client.sendMsg(sender.getUsername() + ": " + message);
+                sender.sendMsg(recipient + ": " + message);
+                return;
+            }
+        }
+        sender.sendMsg("Ошибка: пользователь с ником " + recipient + " не найден.");
+    }
 }
