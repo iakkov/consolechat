@@ -28,7 +28,33 @@ public class ClientHandler {
         new Thread(() -> {
             try {
                 System.out.println("Клиент подключился " + socket.getPort());
+                //Цикл логина
+                while (true) {
+                    sendMsg("Для начала работы надо пройти аутентификацию. Формат команды /log login password");
 
+                    String message = in.readUTF();
+                    if (message.startsWith("/")) {
+                        if (message.equals("/exit")) {
+                            sendMsg("/exitOK");
+                            break;
+                        }
+                        if (message.equals("/log ")) {
+                            String[] tokens = message.split(" ", 3);
+                            if (tokens.length != 3) {
+                                sendMsg("Ошибка авторизации");
+                                continue;
+                            }
+                            if (server.getAuthenticator().authenticate(this, tokens[1], tokens[2])) {
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        sendMsg("Неверная команда");
+                        continue;
+                    }
+                }
+                //Цикл работы
                 while (true) {
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
@@ -92,5 +118,9 @@ public class ClientHandler {
 
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

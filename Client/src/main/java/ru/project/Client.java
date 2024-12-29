@@ -26,6 +26,10 @@ public class Client {
                         if (message.equalsIgnoreCase("/exitok")) {
                             break;
                         }
+                        if (message.startsWith("/authOK ")) {
+                            System.out.println("Авторизация прошла успешно! Имя пользователя: "
+                                    + message.split(" ")[1]);
+                        }
                     } else {
                         System.out.println(message);
                     }
