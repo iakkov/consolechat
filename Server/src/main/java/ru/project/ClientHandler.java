@@ -38,8 +38,8 @@ public class ClientHandler {
                             sendMsg("/exitOK");
                             break;
                         }
-                        if (message.equals("/log ")) {
-                            String[] tokens = message.split(" ", 3);
+                        String[] tokens = message.split(" ", 3);
+                        if (tokens[0].equals("/log")) {
                             if (tokens.length != 3) {
                                 sendMsg("Ошибка авторизации");
                                 continue;
@@ -51,7 +51,6 @@ public class ClientHandler {
                     }
                     else {
                         sendMsg("Неверная команда");
-                        continue;
                     }
                 }
                 //Цикл работы
