@@ -25,15 +25,15 @@ public class ClientHandler {
                 System.out.println("Клиент подключился " + socket.getPort());
                 //Цикл логина
                 while (true) {
-                    sendMsg("Для начала работы надо пройти аутентификацию. Формат команды /log login password");
-
+                    sendMsg("Для начала работы надо пройти аутентификацию. Формат команды /log login password\n" +
+                            "или регистрацию. Формат команды /reg username login password ");
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equals("/exit")) {
                             sendMsg("/exitOK");
                             break;
                         }
-                        String[] tokens = message.split(" ", 3);
+                        String[] tokens = message.split(" ");
                         if (tokens[0].equals("/log")) {
                             if (tokens.length != 3) {
                                 sendMsg("Ошибка авторизации");
@@ -44,6 +44,15 @@ public class ClientHandler {
                                 isLogged = true;
                                 break;
                             }
+                        }
+                        if (message.startsWith("/reg")) {
+                            if (tokens.length != 4) {
+                                sendMsg("Неверный формат команды /reg");
+                                continue;
+                            }
+                            if (server.getAuthenticator()
+                                    .registration(this, tokens[1], tokens[2], tokens[3]));
+                            break;
                         }
                     }
                     else {
