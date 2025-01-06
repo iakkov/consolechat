@@ -12,6 +12,7 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private String username;
+    private boolean isLogged = false;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
@@ -40,6 +41,7 @@ public class ClientHandler {
                             }
                             if (server.getAuthenticator()
                                     .authenticate(this, tokens[1], tokens[2])) {
+                                isLogged = true;
                                 break;
                             }
                         }
@@ -49,7 +51,7 @@ public class ClientHandler {
                     }
                 }
                 //Цикл работы
-                while (true) {
+                while (isLogged) {
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equalsIgnoreCase("/exit")) {
