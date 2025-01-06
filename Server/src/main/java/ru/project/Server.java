@@ -9,18 +9,21 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Server {
     private int port;
     private List<ClientHandler> clients;
+    private Authenticator authenticator;
 
     public Server(int port) {
         this.port = port;
         clients = new CopyOnWriteArrayList<>();
+        authenticator = new inMemoryAuthenticator(this);
     }
 
     public void start(){
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Сервер запущен на порту: " + port);
+            authenticator.initialize();
             while (true) {
                 Socket socket = serverSocket.accept();
-                subscribe(new ClientHandler(socket, this));
+                new ClientHandler(socket, this);
             }
 
         } catch (IOException e) {
@@ -51,5 +54,17 @@ public class Server {
             }
         }
         sender.sendMsg("Ошибка: пользователь с ником " + recipient + " не найден.");
+    }
+    public boolean isUserLoggedIn(String username){
+        for (ClientHandler client : clients) {
+            if (client.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Authenticator getAuthenticator() {
+        return authenticator;
     }
 }
