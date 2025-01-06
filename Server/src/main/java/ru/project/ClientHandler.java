@@ -2,8 +2,10 @@ package ru.project;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 
 public class ClientHandler {
@@ -13,6 +15,7 @@ public class ClientHandler {
     private DataOutputStream out;
     private String username;
     private boolean isLogged = false;
+    private Role role;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
@@ -77,6 +80,13 @@ public class ClientHandler {
                             } else {
                                 sendMsg("Неверный формат комманды. Используйте /w <никнейм> <сообщение>");
                             }
+                        } else if (message.startsWith("/kick ")) {
+                            String[] tokens = message.split(" ", 2);
+                            if (tokens.length != 2) {
+                                sendMsg("Неверный формат команды /kick");
+                                continue;
+                            }
+                            server.kickUser(tokens[1], this);
                         }
                     } else {
                         server.broadcastMessage(username + " : " + message);
@@ -129,5 +139,11 @@ public class ClientHandler {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+    public void setRole(Role role) {
+        this.role = role;
+    }
+    public Role getRole() {
+        return role;
     }
 }

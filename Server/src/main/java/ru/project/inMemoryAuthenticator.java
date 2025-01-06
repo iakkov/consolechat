@@ -47,6 +47,11 @@ public class inMemoryAuthenticator implements Authenticator {
             return false;
         }
         clientHandler.setUsername(username);
+        if (clientHandler.getUsername().equals("admin")) {
+            clientHandler.setRole(Role.ADMIN);
+        } else {
+            clientHandler.setRole(Role.USER);
+        }
         server.subscribe(clientHandler);
         clientHandler.sendMsg("/authOK " + username);
         return true;
@@ -83,8 +88,14 @@ public class inMemoryAuthenticator implements Authenticator {
         }
         users.add(new User(username, login, password));
         clientHandler.setUsername(username);
+        if (clientHandler.getUsername().equals("admin")) {
+            clientHandler.setRole(Role.ADMIN);
+        } else {
+            clientHandler.setRole(Role.USER);
+        }
         server.subscribe(clientHandler);
         clientHandler.sendMsg("/regOK " + username);
         return true;
     }
+
 }
