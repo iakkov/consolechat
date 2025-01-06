@@ -21,8 +21,6 @@ public class inMemoryAuthenticator implements Authenticator {
         users = new CopyOnWriteArrayList<>();
         this.server = server;
         users.add(new User("admin", "admin", "admin"));
-        users.add(new User("element1", "element", "123456"));
-        users.add(new User("yellowFish", "yellowFish", "fishing2"));
     }
     @Override
     public void initialize() {

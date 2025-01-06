@@ -45,14 +45,16 @@ public class ClientHandler {
                                 break;
                             }
                         }
-                        if (message.startsWith("/reg")) {
+                        if (tokens[0].equals("/reg")) {
                             if (tokens.length != 4) {
                                 sendMsg("Неверный формат команды /reg");
                                 continue;
                             }
                             if (server.getAuthenticator()
-                                    .registration(this, tokens[1], tokens[2], tokens[3]));
+                                    .registration(this, tokens[1], tokens[2], tokens[3])) {
+                            isLogged = true;
                             break;
+                            }
                         }
                     }
                     else {
