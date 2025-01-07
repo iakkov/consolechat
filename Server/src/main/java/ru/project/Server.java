@@ -68,17 +68,18 @@ public class Server {
         return authenticator;
     }
     public void kickUser(String usernameToKick, ClientHandler adminHandler) {
-        if (!adminHandler.getRole().equals(Role.ADMIN)) {
+        if (adminHandler.getRole().equals(Role.ADMIN)) {
+            for (ClientHandler client : clients) {
+                if (client.getUsername().equals(usernameToKick)) {
+                    client.sendMsg("/exit");
+                    client.disconnect();
+                    broadcastMessage("Пользователь " + usernameToKick + " был отключён администратором");
+                    return;
+                }
+            }
+            adminHandler.sendMsg("Ошибка. Пользователь с ником " + usernameToKick + " не найден");
+        } else {
             adminHandler.sendMsg("Недостаточно прав");
         }
-        for (ClientHandler client : clients) {
-            if (client.getUsername().equals(usernameToKick)) {
-                client.sendMsg("/exit");
-                client.disconnect();
-                broadcastMessage("Пользователь " + usernameToKick + " был отключён администратором");
-                return;
-            }
-        }
-        adminHandler.sendMsg("Ошибка. Пользователь с ником " + usernameToKick + " не найден");
     }
 }
