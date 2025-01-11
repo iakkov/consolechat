@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Scanner;
 
 public class Client {
@@ -20,7 +21,7 @@ public class Client {
 
         new Thread(() -> {
             try {
-                while (true) {
+                while (!socket.isClosed()) {
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equalsIgnoreCase("/exitok")) {
@@ -45,9 +46,13 @@ public class Client {
             }
         }).start();
 
-        while (true) {
+        while (!socket.isClosed()) {
             String message = scanner.nextLine();
-            out.writeUTF(message);
+            try {
+                out.writeUTF(message);
+            } catch (SocketException e) {
+                System.out.println("Вы были отключены от сервера.");
+            }
             if (message.equalsIgnoreCase("/exit")) {
                 break;
             }
