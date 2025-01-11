@@ -14,7 +14,6 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private String username;
-    private boolean isLogged = false;
     private Role role;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
@@ -44,7 +43,6 @@ public class ClientHandler {
                             }
                             if (server.getAuthenticator()
                                     .authenticate(this, tokens[1], tokens[2])) {
-                                isLogged = true;
                                 break;
                             }
                         }
@@ -55,7 +53,6 @@ public class ClientHandler {
                             }
                             if (server.getAuthenticator()
                                     .registration(this, tokens[1], tokens[2], tokens[3])) {
-                            isLogged = true;
                             break;
                             }
                         }
@@ -65,7 +62,7 @@ public class ClientHandler {
                     }
                 }
                 //Цикл работы
-                while (isLogged) {
+                while (true) {
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equalsIgnoreCase("/exit")) {
@@ -93,7 +90,7 @@ public class ClientHandler {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Сокет закрыт, клиент на порту " + socket.getPort() + " отключен.");
             } finally {
                 disconnect();
             }
