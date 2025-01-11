@@ -71,8 +71,7 @@ public class Server {
         if (adminHandler.getRole().equals(Role.ADMIN)) {
             for (ClientHandler client : clients) {
                 if (client.getUsername().equals(usernameToKick)) {
-                    client.sendMsg("/exit");
-                    client.disconnect();
+                    client.sendMsg("/exitok");
                     broadcastMessage("Пользователь " + usernameToKick + " был отключён администратором");
                     return;
                 }
