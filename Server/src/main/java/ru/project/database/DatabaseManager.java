@@ -19,7 +19,13 @@ public class DatabaseManager {
                     role TEXT NOT NULL
                 );
             """;
+            String addAdmin = """
+                    INSERT INTO users (username, login, password, role)
+                                            SELECT 'admin', 'admin', 'admin', 'ADMIN'
+                                            WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
+            """;
             stmt.execute(createTableSQL);
+            stmt.executeUpdate(addAdmin);
         } catch (SQLException e) {
             e.printStackTrace();
         }
