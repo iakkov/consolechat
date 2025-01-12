@@ -26,18 +26,9 @@ public class inMemoryAuthenticator implements Authenticator {
     public void initialize() {
         System.out.println("Инициализация");
     }
-    private String getUsernameByLoginAndPassword(String login, String password) {
-        for (User u : users) {
-            if (u.login.equals(login) && u.password.equals(password)) {
-                return u.username;
-            }
-        }
-        return null;
-    }
-
     @Override
     public boolean authenticate(ClientHandler clientHandler, String login, String password) {
-        String username = getUsernameByLoginAndPassword(login, password);
+        String username = server.getDatabaseManager().getUsernameByLoginAndPassword(login, password);
         if (username == null) {
             clientHandler.sendMsg("Неверный логин и/или пароль");
             return false;
@@ -46,8 +37,8 @@ public class inMemoryAuthenticator implements Authenticator {
             clientHandler.sendMsg("Данный пользователь уже в сети");
             return false;
         }
-        clientHandler.setUsername(username);
-        if (clientHandler.getUsername().equals("admin")) {
+        clientHandler.setUsername(server.getDatabaseManager().authenticate(login, password));
+        if (server.getDatabaseManager().getUserRole(clientHandler.getUsername()).equals(Role.ADMIN)) {
             clientHandler.setRole(Role.ADMIN);
         } else {
             clientHandler.setRole(Role.USER);
@@ -56,36 +47,21 @@ public class inMemoryAuthenticator implements Authenticator {
         clientHandler.sendMsg("/authOK " + username);
         return true;
     }
-    private boolean isLoginAlreadyExist(String login) {
-        for (User u : users) {
-            if (u.login.equals(login)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    private boolean isUsernameAlreadyExist(String username) {
-        for (User u : users) {
-            if (u.username.equals(username)) {
-                return true;
-            }
-        }
-        return false;
-    }
     @Override
     public boolean registration(ClientHandler clientHandler, String username, String login, String password) {
         if (login.length() < 3 || password.length() < 3 || username.length() < 3) {
             clientHandler.sendMsg("Логин 3+ символа,  пароль 3+ символа, имя пользователя 3+ символа");
             return false;
         }
-        if (isLoginAlreadyExist(login)) {
+        if (server.getDatabaseManager().isLoginAlreadyExist(login)) {
             clientHandler.sendMsg("Такой логин уже используется");
             return false;
         }
-        if (isUsernameAlreadyExist(username)) {
+        if (server.getDatabaseManager().isUsernameAlreadyExist(username)) {
             clientHandler.sendMsg("Такое имя пользователя уже используется");
             return false;
         }
+        server.getDatabaseManager().registerUser(username, login, password, Role.USER);
         users.add(new User(username, login, password));
         clientHandler.setUsername(username);
         if (clientHandler.getUsername().equals("admin")) {
@@ -97,5 +73,4 @@ public class inMemoryAuthenticator implements Authenticator {
         clientHandler.sendMsg("/regOK " + username);
         return true;
     }
-
 }
