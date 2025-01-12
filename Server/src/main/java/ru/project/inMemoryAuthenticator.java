@@ -38,7 +38,7 @@ public class inMemoryAuthenticator implements Authenticator {
             return false;
         }
         clientHandler.setUsername(server.getDatabaseManager().authenticate(login, password));
-        if (server.getDatabaseManager().getUserRole(clientHandler.getUsername()).equals(Role.ADMIN)) {
+        if (server.getDatabaseManager().getUserRole(username).equals("ADMIN")) {
             clientHandler.setRole(Role.ADMIN);
         } else {
             clientHandler.setRole(Role.USER);
