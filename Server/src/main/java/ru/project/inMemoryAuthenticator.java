@@ -1,5 +1,6 @@
 package ru.project;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -49,6 +50,23 @@ public class inMemoryAuthenticator implements Authenticator {
     }
     @Override
     public boolean registration(ClientHandler clientHandler, String username, String login, String password) {
+        if (username.length() < 5) {
+            clientHandler.sendMsg("Имя пользователя должно содержать не менее 5 символов.");
+            return false;
+        }
+        if (username.length() > 20) {
+            clientHandler.sendMsg("Имя пользователя не должно содержать более 20 символов.");
+            return false;
+        }
+        char[] usernameChars = new char[username.length()];
+        for (int i = 0; i < username.length(); i++) {
+            usernameChars[i] = username.charAt(i);
+        }
+        //List<Character>
+        //boolean contains = Arrays.stream(usernameChars).anyMatch()
+        //if (Arrays.asList(usernameChars).contains()
+        //)
+
         if (login.length() < 3 || password.length() < 3 || username.length() < 3) {
             clientHandler.sendMsg("Логин 3+ символа,  пароль 3+ символа, имя пользователя 3+ символа");
             return false;

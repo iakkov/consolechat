@@ -53,7 +53,9 @@ public class ClientHandler {
                         }
                         if (message.equalsIgnoreCase("/reg")) {
                             String[] regData = new String[3];
-                            sendMsg("Введите никнейм: ");
+                            sendMsg("Введите никнейм.\n" +
+                                    "Никнейм не должен содержать более 20 символов, и не менее 5 символов\n" +
+                                    "Можно использовать цифры, латинские буквы и знаки \"_\" и \"-\"");
                             regData[0] = in.readUTF();
                             sendMsg("Введите логин: ");
                             regData[1] = in.readUTF();
