@@ -27,33 +27,43 @@ public class ClientHandler {
                 System.out.println("Клиент подключился " + socket.getPort());
                 //Цикл логина
                 while (true) {
-                    sendMsg("Для начала работы надо пройти аутентификацию. Формат команды /log login password\n" +
-                            "или регистрацию. Формат команды /reg username login password ");
+                    sendMsg("Для начала работы надо пройти аутентификацию или регистрацию\n" +
+                            "Формат команды для аутентификации: /log\n" +
+                            "Формат команды для регистрации: /reg\n" +
+                            "Для выхода используйте комманду /exit");
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equals("/exit")) {
                             sendMsg("/exitOK");
                             break;
                         }
-                        String[] tokens = message.split(" ");
-                        if (tokens[0].equals("/log")) {
-                            if (tokens.length != 3) {
-                                sendMsg("Ошибка авторизации");
-                                continue;
-                            }
+                        if (message.equalsIgnoreCase("/log")) {
+                            String[] loginData = new String[2];
+                            sendMsg("Введите логин: ");
+                            loginData[0] = in.readUTF();
+                            sendMsg("Введите пароль: ");
+                            loginData[1] = in.readUTF();
                             if (server.getAuthenticator()
-                                    .authenticate(this, tokens[1], tokens[2])) {
+                                    .authenticate(this, loginData[0], loginData[1])) {
                                 break;
+                            } else {
+                                sendMsg("Ошибка авторизации!");
+                                continue;
                             }
                         }
-                        if (tokens[0].equals("/reg")) {
-                            if (tokens.length != 4) {
-                                sendMsg("Неверный формат команды /reg");
-                                continue;
-                            }
+                        if (message.equalsIgnoreCase("/reg")) {
+                            String[] regData = new String[3];
+                            sendMsg("Введите никнейм: ");
+                            regData[0] = in.readUTF();
+                            sendMsg("Введите логин: ");
+                            regData[1] = in.readUTF();
+                            sendMsg("Введите пароль: ");
+                            regData[2] = in.readUTF();
                             if (server.getAuthenticator()
-                                    .registration(this, tokens[1], tokens[2], tokens[3])) {
-                            break;
+                                    .registration(this, regData[0], regData[1], regData[2])) {
+                                break;
+                            } else {
+                                sendMsg("Ошибка регистрации!");
                             }
                         }
                     }

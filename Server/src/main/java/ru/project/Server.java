@@ -1,5 +1,8 @@
 package ru.project;
 
+import ru.project.database.DatabaseManager;
+
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,9 +14,11 @@ public class Server {
     private int port;
     private List<ClientHandler> clients;
     private Authenticator authenticator;
+    private final DatabaseManager databaseManager;
 
-    public Server(int port) {
+    public Server(int port, DatabaseManager databaseManager) {
         this.port = port;
+        this.databaseManager = databaseManager;
         clients = new CopyOnWriteArrayList<>();
         authenticator = new inMemoryAuthenticator(this);
     }
@@ -80,5 +85,9 @@ public class Server {
         } else {
             adminHandler.sendMsg("Недостаточно прав");
         }
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 }
