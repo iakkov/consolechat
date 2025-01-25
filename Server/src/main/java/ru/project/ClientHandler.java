@@ -2,8 +2,10 @@ package ru.project;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 
 public class ClientHandler {
@@ -11,10 +13,9 @@ public class ClientHandler {
     private Server server;
     private DataInputStream in;
     private DataOutputStream out;
-
     private String username;
-    private static int userCount = 0;
-
+    private boolean isLogged = false;
+    private Role role;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
@@ -22,30 +23,40 @@ public class ClientHandler {
         this.in = new DataInputStream(socket.getInputStream());
         this.out = new DataOutputStream(socket.getOutputStream());
 
-        userCount++;
-        username = "user" + userCount;
-
         new Thread(() -> {
             try {
                 System.out.println("Клиент подключился " + socket.getPort());
                 //Цикл логина
                 while (true) {
-                    sendMsg("Для начала работы надо пройти аутентификацию. Формат команды /log login password");
-
+                    sendMsg("Для начала работы надо пройти аутентификацию. Формат команды /log login password\n" +
+                            "или регистрацию. Формат команды /reg username login password ");
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equals("/exit")) {
                             sendMsg("/exitOK");
                             break;
                         }
-                        String[] tokens = message.split(" ", 3);
+                        String[] tokens = message.split(" ");
                         if (tokens[0].equals("/log")) {
                             if (tokens.length != 3) {
                                 sendMsg("Ошибка авторизации");
                                 continue;
                             }
-                            if (server.getAuthenticator().authenticate(this, tokens[1], tokens[2])) {
+                            if (server.getAuthenticator()
+                                    .authenticate(this, tokens[1], tokens[2])) {
+                                isLogged = true;
                                 break;
+                            }
+                        }
+                        if (tokens[0].equals("/reg")) {
+                            if (tokens.length != 4) {
+                                sendMsg("Неверный формат команды /reg");
+                                continue;
+                            }
+                            if (server.getAuthenticator()
+                                    .registration(this, tokens[1], tokens[2], tokens[3])) {
+                            isLogged = true;
+                            break;
                             }
                         }
                     }
@@ -54,7 +65,7 @@ public class ClientHandler {
                     }
                 }
                 //Цикл работы
-                while (true) {
+                while (isLogged) {
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equalsIgnoreCase("/exit")) {
@@ -69,6 +80,13 @@ public class ClientHandler {
                             } else {
                                 sendMsg("Неверный формат комманды. Используйте /w <никнейм> <сообщение>");
                             }
+                        } else if (message.startsWith("/kick ")) {
+                            String[] tokens = message.split(" ", 2);
+                            if (tokens.length != 2) {
+                                sendMsg("Неверный формат команды /kick");
+                                continue;
+                            }
+                            server.kickUser(tokens[1], this);
                         }
                     } else {
                         server.broadcastMessage(username + " : " + message);
@@ -121,5 +139,11 @@ public class ClientHandler {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+    public void setRole(Role role) {
+        this.role = role;
+    }
+    public Role getRole() {
+        return role;
     }
 }

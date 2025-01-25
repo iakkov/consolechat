@@ -30,6 +30,10 @@ public class Client {
                             System.out.println("Авторизация прошла успешно! Имя пользователя: "
                                     + message.split(" ")[1]);
                         }
+                        if (message.startsWith("/regOK ")) {
+                            System.out.println("Регистрация прошла успешно! Имя пользователя: "
+                                    + message.split(" ")[1]);
+                        }
                     } else {
                         System.out.println(message);
                     }
