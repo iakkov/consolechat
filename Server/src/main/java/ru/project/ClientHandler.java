@@ -53,11 +53,16 @@ public class ClientHandler {
                         }
                         if (message.equalsIgnoreCase("/reg")) {
                             String[] regData = new String[3];
-                            sendMsg("Введите никнейм: ");
+                            sendMsg("Введите никнейм.\n" +
+                                    "Никнейм не должен содержать более 20 символов, и не менее 5 символов\n" +
+                                    "Можно использовать цифры, латинские буквы и знаки \"_\" и \"-\"");
                             regData[0] = in.readUTF();
-                            sendMsg("Введите логин: ");
+                            sendMsg("Введите логин.\n" +
+                                    "Логин не должен содержать более 20 символов, и не менее 5 символов\n" +
+                                    "Можно использовать цифры, латинские буквы и знаки \"_\" и \"-\"");
                             regData[1] = in.readUTF();
-                            sendMsg("Введите пароль: ");
+                            sendMsg("Введите пароль.\n" +
+                                    "Пароль должен содержать от 5 до 20 символов и обязательно включать в себя любой специальный символ.");
                             regData[2] = in.readUTF();
                             if (server.getAuthenticator()
                                     .registration(this, regData[0], regData[1], regData[2])) {

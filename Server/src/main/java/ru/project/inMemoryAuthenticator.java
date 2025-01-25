@@ -1,5 +1,6 @@
 package ru.project;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -49,8 +50,18 @@ public class inMemoryAuthenticator implements Authenticator {
     }
     @Override
     public boolean registration(ClientHandler clientHandler, String username, String login, String password) {
-        if (login.length() < 3 || password.length() < 3 || username.length() < 3) {
-            clientHandler.sendMsg("Логин 3+ символа,  пароль 3+ символа, имя пользователя 3+ символа");
+        String regex = "^[a-zA-Z0-9_-]{5,20}$";
+        String regexForPassword = "^(?=.*[!@#$%^&*(),.?\":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?\":{}|<>]{5,20}$";
+        if(!username.matches(regex)) {
+            clientHandler.sendMsg("Убедитесь, что имя пользователя соответствует требованиям");
+            return false;
+        }
+        if(!login.matches(regex)) {
+            clientHandler.sendMsg("Убедитесь, что логин соответствует требованиям");
+            return false;
+        }
+        if (!password.matches(regexForPassword)) {
+            clientHandler.sendMsg("Убедитесь, что пароль соответствует требованиям");
             return false;
         }
         if (server.getDatabaseManager().isLoginAlreadyExist(login)) {
