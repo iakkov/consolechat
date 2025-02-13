@@ -6,6 +6,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class ClientHandler {
@@ -101,7 +103,8 @@ public class ClientHandler {
                             server.kickUser(tokens[1], this);
                         }
                     } else {
-                        server.broadcastMessage(username + " : " + message);
+                        String messageWithTime = "[" + getCurrentTime() + "]" + username + " : " + message;
+                        server.broadcastMessage(messageWithTime);
                     }
                 }
             } catch (IOException e) {
@@ -157,5 +160,8 @@ public class ClientHandler {
     }
     public Role getRole() {
         return role;
+    }
+    private String getCurrentTime() {
+        return new SimpleDateFormat("HH:mm:ss").format(new Date());
     }
 }
