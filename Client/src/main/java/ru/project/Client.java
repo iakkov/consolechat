@@ -35,6 +35,9 @@ public class Client {
                             System.out.println("Регистрация прошла успешно! Имя пользователя: "
                                     + message.split(" ")[1]);
                         }
+                        if (message.equalsIgnoreCase("/banok")) {
+                            
+                        }
                     } else {
                         System.out.println(message);
                     }
