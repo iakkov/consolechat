@@ -86,6 +86,20 @@ public class Server {
             adminHandler.sendMsg("Недостаточно прав");
         }
     }
+    public void banUser(String usernameToBan, ClientHandler adminHandler) {
+        if (adminHandler.getRole().equals(Role.ADMIN)) {
+            for (ClientHandler client : client) {
+                if (client.getUsername().equals(usernameToBan)) {
+                    client.sendMsg("/banok");
+                    broadcastMessage("Пользователь " + usernameToBan + " был забанен администратором");
+                    return;
+                }
+            }
+            adminHandler.sendMsg("Ошибка. Пользователь с ником " + usernameToBan + " не найден");
+        } else {
+            adminHandler.sendMsg("Недостаточно прав");
+        }
+    }
 
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
