@@ -114,7 +114,6 @@ public class Server {
             adminHandler.sendMsg("Недостаточно прав");
         }
     }
-
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }

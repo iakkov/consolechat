@@ -121,9 +121,8 @@ public class ClientHandler {
                                 server.unbanUser(tokens[1], this);
                                 targetUserIsBanned = false;
                             } else sendMsg("Пользователь " + tokens[1] + " не находится в бане");
-
+                          }
                         }
-                    }
                     else {
                         String messageWithTime = "[" + getCurrentTime() + "]" + username + " : " + message;
                         server.broadcastMessage(messageWithTime);
