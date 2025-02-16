@@ -12,6 +12,7 @@ public class Client {
     private DataOutputStream out;
     private DataInputStream in;
     private Scanner scanner;
+    private boolean isBanned = false;
 
     public Client() throws IOException {
         scanner = new Scanner(System.in);
@@ -36,7 +37,8 @@ public class Client {
                                     + message.split(" ")[1]);
                         }
                         if (message.equalsIgnoreCase("/banok")) {
-                            
+                            isBanned = true;
+                            System.out.println("Вы были заблокированы администратором.");
                         }
                     } else {
                         System.out.println(message);
@@ -52,7 +54,9 @@ public class Client {
         while (!socket.isClosed()) {
             String message = scanner.nextLine();
             try {
-                out.writeUTF(message);
+                if (!isBanned) {
+                    out.writeUTF(message);
+                } else System.out.println("Вы не можете писать сообщения.");
             } catch (SocketException e) {
                 System.out.println("Вы были отключены от сервера.");
             }

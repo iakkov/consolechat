@@ -88,7 +88,7 @@ public class Server {
     }
     public void banUser(String usernameToBan, ClientHandler adminHandler) {
         if (adminHandler.getRole().equals(Role.ADMIN)) {
-            for (ClientHandler client : client) {
+            for (ClientHandler client : clients) {
                 if (client.getUsername().equals(usernameToBan)) {
                     client.sendMsg("/banok");
                     broadcastMessage("Пользователь " + usernameToBan + " был забанен администратором");

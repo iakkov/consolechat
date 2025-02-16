@@ -101,17 +101,15 @@ public class ClientHandler {
                                 continue;
                             }
                             server.kickUser(tokens[1], this);
+                        } else if (message.startsWith("/ban ")) {
+                            String[] tokens = message.split(" ", 2);
+                            if (tokens.length != 2) {
+                                sendMsg("Неверный формат команды /ban");
+                                continue;
+                            }
+                            server.banUser(tokens[1], this);
                         }
-                    } else if (message.startsWith("/ban ")) {
-                        String[] tokens = message.split(" ", 2);
-                        if (tokens.length != 2) {
-                            sendMsg("Неверный формат команды /ban");
-                            continue;
-                        }
-                        server.banUser(tokens[1], this);
                     }
-                    
-                    
                     else {
                         String messageWithTime = "[" + getCurrentTime() + "]" + username + " : " + message;
                         server.broadcastMessage(messageWithTime);
