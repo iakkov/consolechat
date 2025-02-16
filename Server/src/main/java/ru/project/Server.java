@@ -86,7 +86,34 @@ public class Server {
             adminHandler.sendMsg("Недостаточно прав");
         }
     }
-
+    public void banUser(String usernameToBan, ClientHandler adminHandler) {
+        if (adminHandler.getRole().equals(Role.ADMIN)) {
+            for (ClientHandler client : clients) {
+                if (client.getUsername().equals(usernameToBan)) {
+                    client.sendMsg("/banok");
+                    broadcastMessage("Пользователь " + usernameToBan + " был забанен администратором");
+                    return;
+                }
+            }
+            adminHandler.sendMsg("Ошибка. Пользователь с ником " + usernameToBan + " не найден");
+        } else {
+            adminHandler.sendMsg("Недостаточно прав");
+        }
+    }
+    public void unbanUser(String usernameToUnban, ClientHandler adminHandler) {
+        if (adminHandler.getRole().equals(Role.ADMIN)) {
+            for (ClientHandler client : clients) {
+                if (client.getUsername().equals(usernameToUnban)) {
+                    client.sendMsg("/unbanok");
+                    broadcastMessage("Пользователь " + usernameToUnban + " был разбанен администратором");
+                    return;
+                }
+            }
+            adminHandler.sendMsg("Ошибка. Пользователь с ником " + usernameToUnban + " не найден");
+        } else {
+            adminHandler.sendMsg("Недостаточно прав");
+        }
+    }
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
