@@ -82,6 +82,7 @@ public class ClientHandler {
                 //Цикл работы
                 while (true) {
                     String message = in.readUTF();
+                    boolean targetUserIsBanned = false;
                     if (message.startsWith("/")) {
                         if (message.equalsIgnoreCase("/exit")) {
                             sendMsg("/exitok");
@@ -109,6 +110,18 @@ public class ClientHandler {
                                 continue;
                             }
                             server.banUser(tokens[1], this);
+                            targetUserIsBanned = true;
+                        } else if (message.startsWith("/unban ")) {
+                            String[] tokens = message.split(" ", 2);
+                            if (tokens.length != 2) {
+                                sendMsg("Неверный формат комманды /unban");
+                                continue;
+                            }
+                            if (targetUserIsBanned) {
+                                server.unbanUser(tokens[1], this);
+                                targetUserIsBanned = false;
+                            } else sendMsg("Пользователь " + tokens[1] + " не находится в бане");
+
                         }
                     }
                     else {

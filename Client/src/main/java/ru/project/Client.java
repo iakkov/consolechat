@@ -40,6 +40,10 @@ public class Client {
                             isBanned = true;
                             System.out.println("Вы были заблокированы администратором.");
                         }
+                        if (message.equalsIgnoreCase("/unbanok")) {
+                            isBanned = false;
+                            System.out.println("Теперь вы не заблокированы. Вам доступна отправка сообщений в чат.");
+                        }
                     } else {
                         System.out.println(message);
                     }
