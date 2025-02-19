@@ -2,10 +2,12 @@ package ru.project;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
+import javafx.geometry.Insets;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -32,7 +34,8 @@ public class ChatClientGUI extends Application {
         Button sendButton = new Button("Отправить");
         sendButton.setOnAction(e -> sendMessage());
 
-        VBox root = new VBox(10, inputField, sendButton);
+        VBox root = new VBox(10,chatArea, inputField, sendButton);
+        root.setPadding(new Insets(10, 10, 10, 10));
         Scene scene = new Scene(root, 400, 300);
 
         primaryStage.setTitle("Чат-клиент");
