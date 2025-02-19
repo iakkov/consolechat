@@ -1,5 +1,6 @@
 package ru.project;
 
+import ru.project.checktime.CheckTime;
 import ru.project.database.DatabaseManager;
 
 import javax.xml.crypto.Data;
@@ -21,6 +22,8 @@ public class Server {
         this.databaseManager = databaseManager;
         clients = new CopyOnWriteArrayList<>();
         authenticator = new inMemoryAuthenticator(this);
+
+        new CheckTime(this).start();
     }
 
     public void start(){
@@ -116,5 +119,16 @@ public class Server {
     }
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public String getOnlineUsers() {
+        StringBuilder sb = new StringBuilder("Сейчас онлайн:\n");
+        for (ClientHandler client : clients) {
+            sb.append(client.getUsername()).append("\n");
+        }
+        return sb.toString();
+    }
+    public List<ClientHandler> getClients() {
+        return this.clients;
     }
 }

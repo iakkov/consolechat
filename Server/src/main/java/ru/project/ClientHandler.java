@@ -15,12 +15,14 @@ public class ClientHandler {
     private final DataOutputStream out;
     private String username;
     private Role role;
+    private long lastActiveTime;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
         this.server = server;
         this.in = new DataInputStream(socket.getInputStream());
         this.out = new DataOutputStream(socket.getOutputStream());
+        this.lastActiveTime = System.currentTimeMillis();
 
         new Thread(() -> {
             try {
@@ -121,7 +123,9 @@ public class ClientHandler {
                                 server.unbanUser(tokens[1], this);
                                 targetUserIsBanned = false;
                             } else sendMsg("Пользователь " + tokens[1] + " не находится в бане");
-                          }
+                          } else if (message.equalsIgnoreCase("/online")) {
+                            sendMsg(server.getOnlineUsers());
+                        }
                         }
                     else {
                         String messageWithTime = "[" + getCurrentTime() + "]" + username + " : " + message;
@@ -184,5 +188,9 @@ public class ClientHandler {
     }
     private String getCurrentTime() {
         return new SimpleDateFormat("HH:mm:ss").format(new Date());
+    }
+
+    public long getLastActiveTime() {
+        return lastActiveTime;
     }
 }
