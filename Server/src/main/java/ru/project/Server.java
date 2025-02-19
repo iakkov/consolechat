@@ -42,11 +42,14 @@ public class Server {
 
     public void subscribe(ClientHandler clientHandler){
         clients.add(clientHandler);
+        broadcastMessage("В чат зашел: " + clientHandler.getUsername());
+        System.out.println("[SERVER] Пользователь " + clientHandler.getUsername() + " подключился.");
     }
 
     public void unsubscribe(ClientHandler clientHandler){
         clients.remove(clientHandler);
         broadcastMessage("Из чата вышел: "+ clientHandler.getUsername());
+        System.out.println("[SERVER] Клиент " + clientHandler.getUsername() + " отключён.");
     }
 
     public void broadcastMessage(String message){
