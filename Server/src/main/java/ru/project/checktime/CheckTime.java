@@ -2,12 +2,9 @@ package ru.project.checktime;
 
 import ru.project.*;
 
-import java.util.ArrayList;
-
 public class CheckTime extends Thread {
     private static final long TIMEOUT = 20 * 60 * 1000;
-    private Server server;
-    private ClientHandler clientHandler;
+    private final Server server;
 
     public CheckTime(Server server) {
         this.server = server;
@@ -28,7 +25,7 @@ public class CheckTime extends Thread {
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                server.broadcastMessage("Ошибка CheckTime");
             }
         }
     }

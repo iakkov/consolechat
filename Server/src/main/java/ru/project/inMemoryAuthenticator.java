@@ -1,14 +1,13 @@
 package ru.project;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class inMemoryAuthenticator implements Authenticator {
-    public class User {
-        private String username;
-        private String login;
-        private String password;
+    public static class User {
+        private final String username;
+        private final String login;
+        private final String password;
 
         public User(String username, String login, String password) {
             this.username = username;
@@ -16,8 +15,8 @@ public class inMemoryAuthenticator implements Authenticator {
             this.password = password;
         }
     }
-    private List<User> users;
-    private Server server;
+    private final List<User> users;
+    private final Server server;
     public inMemoryAuthenticator(Server server) {
         users = new CopyOnWriteArrayList<>();
         this.server = server;

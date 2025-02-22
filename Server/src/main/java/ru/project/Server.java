@@ -95,8 +95,13 @@ public class Server {
         if (adminHandler.getRole().equals(Role.ADMIN)) {
             for (ClientHandler client : clients) {
                 if (client.getUsername().equals(usernameToBan)) {
-                    client.sendMsg("/banok");
-                    broadcastMessage("Пользователь " + usernameToBan + " был забанен администратором");
+                    if (client.isBanned()) {
+                        adminHandler.sendMsg("Ошибка. Пользователь с ником " + usernameToBan + " уже забанен!");
+                    } else {
+                        client.sendMsg("/banok");
+                        broadcastMessage("Пользователь " + usernameToBan + " был забанен администратором");
+                        client.changeBanFlag();
+                    }
                     return;
                 }
             }
@@ -109,8 +114,13 @@ public class Server {
         if (adminHandler.getRole().equals(Role.ADMIN)) {
             for (ClientHandler client : clients) {
                 if (client.getUsername().equals(usernameToUnban)) {
-                    client.sendMsg("/unbanok");
-                    broadcastMessage("Пользователь " + usernameToUnban + " был разбанен администратором");
+                    if (!client.isBanned()) {
+                        adminHandler.sendMsg("Ошибка. Пользователь с ником " + usernameToUnban + " не находится в бане");
+                    } else {
+                        client.sendMsg("/unbanok");
+                        broadcastMessage("Пользователь " + usernameToUnban + " был разбанен администратором");
+                        client.changeBanFlag();
+                    }
                     return;
                 }
             }

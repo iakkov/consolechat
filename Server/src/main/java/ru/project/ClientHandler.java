@@ -15,8 +15,9 @@ public class ClientHandler {
     private final DataOutputStream out;
     private String username;
     private Role role;
-    private long lastActiveTime;
+    private final long lastActiveTime;
     private String currentRoom = null;
+    boolean banFlag;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
@@ -85,7 +86,7 @@ public class ClientHandler {
                 //Цикл работы
                 while (true) {
                     String message = in.readUTF();
-                    boolean targetUserIsBanned = false;
+                    this.banFlag = false;
                     if (message.startsWith("/")) {
                         if (message.equalsIgnoreCase("/exit")) {
                             sendMsg("/exitok");
@@ -113,17 +114,13 @@ public class ClientHandler {
                                 continue;
                             }
                             server.banUser(tokens[1], this);
-                            targetUserIsBanned = true;
                         } else if (message.startsWith("/unban ")) {
                             String[] tokens = message.split(" ", 2);
                             if (tokens.length != 2) {
                                 sendMsg("Неверный формат комманды /unban");
                                 continue;
                             }
-                            if (targetUserIsBanned) {
-                                server.unbanUser(tokens[1], this);
-                                targetUserIsBanned = false;
-                            } else sendMsg("Пользователь " + tokens[1] + " не находится в бане");
+                            server.unbanUser(tokens[1], this);
                           } else if (message.equalsIgnoreCase("/online")) {
                             sendMsg(server.getOnlineUsers());
                         } else if (message.startsWith("/createroom ")) {
@@ -186,7 +183,6 @@ public class ClientHandler {
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String username) {
         this.username = username;
     }
@@ -199,7 +195,6 @@ public class ClientHandler {
     private String getCurrentTime() {
         return new SimpleDateFormat("HH:mm:ss").format(new Date());
     }
-
     public long getLastActiveTime() {
         return lastActiveTime;
     }
@@ -208,5 +203,11 @@ public class ClientHandler {
     }
     public String getCurrentRoom() {
         return currentRoom;
+    }
+    public boolean isBanned() {
+        return banFlag;
+    }
+    public void changeBanFlag() {
+        banFlag = !banFlag;
     }
 }
