@@ -16,6 +16,7 @@ public class ClientHandler {
     private String username;
     private Role role;
     private long lastActiveTime;
+    private String currentRoom = null;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
@@ -125,9 +126,18 @@ public class ClientHandler {
                             } else sendMsg("Пользователь " + tokens[1] + " не находится в бане");
                           } else if (message.equalsIgnoreCase("/online")) {
                             sendMsg(server.getOnlineUsers());
+                        } else if (message.startsWith("/createroom ")) {
+                            String roomName = message.substring(12).trim();
+                            server.createRoom(roomName, this);
+                        } else if (message.startsWith("/room ")) {
+                            String roomName = message.substring(6).trim();
+                            server.joinRoom(roomName, this);
+                        } else if (message.equals("/exitroom")) {
+                            server.exitRoom(this);
                         }
-                        }
-                    else {
+                    } else if (currentRoom != null) {
+                        server.sendToRoom(currentRoom, "[" + getCurrentTime() + "] " + username + ": " + message);
+                    } else {
                         String messageWithTime = "[" + getCurrentTime() + "]" + username + " : " + message;
                         server.broadcastMessage(messageWithTime);
                     }
@@ -192,5 +202,11 @@ public class ClientHandler {
 
     public long getLastActiveTime() {
         return lastActiveTime;
+    }
+    public void setCurrentRoom(String roomName) {
+        this.currentRoom = roomName;
+    }
+    public String getCurrentRoom() {
+        return currentRoom;
     }
 }

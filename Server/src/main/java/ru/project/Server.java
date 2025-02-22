@@ -2,12 +2,11 @@ package ru.project;
 
 import ru.project.checktime.CheckTime;
 import ru.project.database.DatabaseManager;
+import ru.project.rooms.Rooms;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -16,6 +15,7 @@ public class Server {
     private List<ClientHandler> clients;
     private Authenticator authenticator;
     private final DatabaseManager databaseManager;
+    private final Rooms rooms = new Rooms();
 
     public Server(int port, DatabaseManager databaseManager) {
         this.port = port;
@@ -25,7 +25,6 @@ public class Server {
 
         new CheckTime(this).start();
     }
-
     public void start(){
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Сервер запущен на порту: " + port);
@@ -133,5 +132,24 @@ public class Server {
     }
     public List<ClientHandler> getClients() {
         return this.clients;
+    }
+    public void createRoom(String roomName, ClientHandler owner) {
+        rooms.createRoom(roomName, owner);
+    }
+
+    public void joinRoom(String roomName, ClientHandler client) {
+        rooms.joinRoom(roomName, client);
+    }
+
+    public void exitRoom(ClientHandler client) {
+        rooms.exitRoom(client);
+    }
+
+    public void sendToRoom(String roomName, String message) {
+        rooms.sendToRoom(roomName, message);
+    }
+
+    public boolean isUserInRoom(ClientHandler client) {
+        return rooms.isUserInRoom(client);
     }
 }
