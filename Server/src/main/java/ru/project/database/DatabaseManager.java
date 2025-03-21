@@ -4,7 +4,7 @@ import ru.project.Role;
 import java.sql.*;
 
 public class DatabaseManager {
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres?currentSchema=public&user=postgres&password=admin";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres?currentSchema=public&user=postgres&password=postgres";
 
 
     public DatabaseManager() {

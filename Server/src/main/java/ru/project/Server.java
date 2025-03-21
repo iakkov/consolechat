@@ -1,5 +1,6 @@
 package ru.project;
 
+import ru.project.checktime.CheckTime;
 import ru.project.database.DatabaseManager;
 
 import javax.xml.crypto.Data;
@@ -21,6 +22,8 @@ public class Server {
         this.databaseManager = databaseManager;
         clients = new CopyOnWriteArrayList<>();
         authenticator = new inMemoryAuthenticator(this);
+
+        new CheckTime(this).start();
     }
 
     public void start(){
@@ -88,7 +91,7 @@ public class Server {
     }
     public void banUser(String usernameToBan, ClientHandler adminHandler) {
         if (adminHandler.getRole().equals(Role.ADMIN)) {
-            for (ClientHandler client : client) {
+            for (ClientHandler client : clients) {
                 if (client.getUsername().equals(usernameToBan)) {
                     client.sendMsg("/banok");
                     broadcastMessage("Пользователь " + usernameToBan + " был забанен администратором");
@@ -100,8 +103,32 @@ public class Server {
             adminHandler.sendMsg("Недостаточно прав");
         }
     }
-
+    public void unbanUser(String usernameToUnban, ClientHandler adminHandler) {
+        if (adminHandler.getRole().equals(Role.ADMIN)) {
+            for (ClientHandler client : clients) {
+                if (client.getUsername().equals(usernameToUnban)) {
+                    client.sendMsg("/unbanok");
+                    broadcastMessage("Пользователь " + usernameToUnban + " был разбанен администратором");
+                    return;
+                }
+            }
+            adminHandler.sendMsg("Ошибка. Пользователь с ником " + usernameToUnban + " не найден");
+        } else {
+            adminHandler.sendMsg("Недостаточно прав");
+        }
+    }
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public String getOnlineUsers() {
+        StringBuilder sb = new StringBuilder("Сейчас онлайн:\n");
+        for (ClientHandler client : clients) {
+            sb.append(client.getUsername()).append("\n");
+        }
+        return sb.toString();
+    }
+    public List<ClientHandler> getClients() {
+        return this.clients;
     }
 }

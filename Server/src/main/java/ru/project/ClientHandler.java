@@ -2,37 +2,38 @@ package ru.project;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
 public class ClientHandler {
-    private Socket socket;
-    private Server server;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private final Socket socket;
+    private final Server server;
+    private final DataInputStream in;
+    private final DataOutputStream out;
     private String username;
     private Role role;
+    private long lastActiveTime;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
         this.server = server;
         this.in = new DataInputStream(socket.getInputStream());
         this.out = new DataOutputStream(socket.getOutputStream());
+        this.lastActiveTime = System.currentTimeMillis();
 
         new Thread(() -> {
             try {
                 System.out.println("Клиент подключился " + socket.getPort());
                 //Цикл логина
                 while (true) {
-                    sendMsg("Для начала работы надо пройти аутентификацию или регистрацию\n" +
-                            "Формат команды для аутентификации: /log\n" +
-                            "Формат команды для регистрации: /reg\n" +
-                            "Для выхода используйте комманду /exit");
+                    sendMsg("""
+                            Для начала работы надо пройти аутентификацию или регистрацию
+                            Формат команды для аутентификации: /log
+                            Формат команды для регистрации: /reg
+                            Для выхода используйте комманду /exit""");
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equals("/exit")) {
@@ -55,13 +56,15 @@ public class ClientHandler {
                         }
                         if (message.equalsIgnoreCase("/reg")) {
                             String[] regData = new String[3];
-                            sendMsg("Введите никнейм.\n" +
-                                    "Никнейм не должен содержать более 20 символов, и не менее 5 символов\n" +
-                                    "Можно использовать цифры, латинские буквы и знаки \"_\" и \"-\"");
+                            sendMsg("""
+                                    Введите никнейм.
+                                    Никнейм не должен содержать более 20 символов, и не менее 5 символов
+                                    Можно использовать цифры, латинские буквы и знаки "_" и "-\"""");
                             regData[0] = in.readUTF();
-                            sendMsg("Введите логин.\n" +
-                                    "Логин не должен содержать более 20 символов, и не менее 5 символов\n" +
-                                    "Можно использовать цифры, латинские буквы и знаки \"_\" и \"-\"");
+                            sendMsg("""
+                                    Введите логин.
+                                    Логин не должен содержать более 20 символов, и не менее 5 символов
+                                    Можно использовать цифры, латинские буквы и знаки "_" и "-\"""");
                             regData[1] = in.readUTF();
                             sendMsg("Введите пароль.\n" +
                                     "Пароль должен содержать от 5 до 20 символов и обязательно включать в себя любой специальный символ.");
@@ -81,6 +84,7 @@ public class ClientHandler {
                 //Цикл работы
                 while (true) {
                     String message = in.readUTF();
+                    boolean targetUserIsBanned = false;
                     if (message.startsWith("/")) {
                         if (message.equalsIgnoreCase("/exit")) {
                             sendMsg("/exitok");
@@ -101,17 +105,28 @@ public class ClientHandler {
                                 continue;
                             }
                             server.kickUser(tokens[1], this);
+                        } else if (message.startsWith("/ban ")) {
+                            String[] tokens = message.split(" ", 2);
+                            if (tokens.length != 2) {
+                                sendMsg("Неверный формат команды /ban");
+                                continue;
+                            }
+                            server.banUser(tokens[1], this);
+                            targetUserIsBanned = true;
+                        } else if (message.startsWith("/unban ")) {
+                            String[] tokens = message.split(" ", 2);
+                            if (tokens.length != 2) {
+                                sendMsg("Неверный формат комманды /unban");
+                                continue;
+                            }
+                            if (targetUserIsBanned) {
+                                server.unbanUser(tokens[1], this);
+                                targetUserIsBanned = false;
+                            } else sendMsg("Пользователь " + tokens[1] + " не находится в бане");
+                          } else if (message.equalsIgnoreCase("/online")) {
+                            sendMsg(server.getOnlineUsers());
                         }
-                    } else if (message.startsWith("/ban ")) {
-                        String[] tokens = message.split(" ", 2);
-                        if (tokens.length != 2) {
-                            sendMsg("Неверный формат команды /ban");
-                            continue;
                         }
-                        server.banUser(tokens[1], this);
-                    }
-                    
-                    
                     else {
                         String messageWithTime = "[" + getCurrentTime() + "]" + username + " : " + message;
                         server.broadcastMessage(messageWithTime);
@@ -173,5 +188,9 @@ public class ClientHandler {
     }
     private String getCurrentTime() {
         return new SimpleDateFormat("HH:mm:ss").format(new Date());
+    }
+
+    public long getLastActiveTime() {
+        return lastActiveTime;
     }
 }
